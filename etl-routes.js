@@ -3085,7 +3085,6 @@ module.exports = function () {
                     }
                 },
                 handler: function (request, reply) {
-                    request.query.groupBy = 'groupByCurArvMeds,groupByPrevArvMeds';
                     let requestParams = Object.assign({}, request.query, request.params);
                     let reportParams = etlHelpers.getReportParams('medical-history-report', ['patientUuid'],
                         requestParams);

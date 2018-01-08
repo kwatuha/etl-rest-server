@@ -180,7 +180,7 @@ module.exports = function () {
                 }
                 
             });
-            return matchingName?matchingName.name:arvNames.join(', ');
+            return matchingName?matchingName.name:arvNames.sort().join(', ');
         },
 
         getTestsOrderedNames: function getTestsOrderedNames(str) {
