@@ -33,7 +33,7 @@
         "schema": "amrs",
         "tableName": "patient_state",
         "alias": "t5",
-        "joinExpression": "t4.patient_program_id = t5.patient_program_id"
+        "joinExpression": "t4.patient_program_id = t5.patient_program_id and t5.end_date is null"
       },
       {
         "joinType": "INNER JOIN",
@@ -50,6 +50,13 @@
         "joinExpression": "t4.location_id = t7.location_id"
       },
 
+      {
+        "joinType": "INNER JOIN",
+        "schema": "amrs",
+        "tableName": "concept",
+        "alias": "t8",
+        "joinExpression": "t6.concept_id = t8.concept_id"
+      },
       {
         "joinType": "INNER JOIN",
         "schema": "amrs",
@@ -73,6 +80,7 @@
       {"name":"locationUuids","defaultValue":[]},
       {"name":"programUuids","defaultValue":[]},
       {"name":"stateUuids","defaultValue":[]},
+      {"name":"conceptUuids","defaultValue":[]},
       {"name":"startAge", "defaultValue":[]},
       {"name":"endAge", "defaultValue":[]},
       {"name":"gender", "defaultValue":[]},
@@ -110,10 +118,6 @@
         "parameter": "programUuids"
       },
       {
-        "expression": "t6.uuid in ?",
-        "parameter": "stateUuids"
-      },
-      {
         "expression": "t7.uuid in ?",
         "parameter": "locationUuids"
       },
@@ -121,12 +125,14 @@
       {
         "expression":"t10.gender in ?",
         "parameter":"gender"
+      },
+      {
+        "expression": "t8.uuid in ?",
+        "parameter": "stateUuids"
       }
-
-
-
     ],
     "groupClause": [
+      {"parameter":"groupByLocation"},
       {"parameter":"groupByProgram"},
       {"parameter":"groupByState"}
 
@@ -137,7 +143,7 @@
       {
         "label": "counts",
         "type": "single",
-        "sql": "count(t5.state)"
+        "sql": "count(distinct t4.patient_id)"
       },
       {
         "label": "state",
@@ -174,11 +180,22 @@
         "type": "single",
         "sql": "t6.uuid"
       },
+      {       
+        "label": "conceptUuids",
+        "type": "single",
+        "sql": "t8.uuid"
+      },
 
       {
         "label": "state_name",
         "type": "single",
         "sql": "t9.name"
+      },
+      {
+
+        "label": "program",
+        "type": "single",
+        "sql": "t2.name"
       },
       {
         "label": "person_id",
@@ -216,11 +233,18 @@
   {
     "name": "referral-patient-list",
     "table": {
-      "schema": "amrs",
-      "tableName": "patient_program",
-      "alias": "t1"
+      "schema": "etl",
+      "tableName": "patient_referral",
+      "alias": "t10"
     },
     "joins": [
+      {
+        "joinType": "INNER JOIN",
+        "schema": "amrs",
+        "tableName": "patient_program",
+        "alias": "t1",
+        "joinExpression": "t10.patient_program_id  = t1.patient_program_id"
+      },
       {
         "joinType": "INNER JOIN",
         "schema": "amrs",
@@ -254,7 +278,7 @@
         "schema": "amrs",
         "tableName": "patient_state",
         "alias": "t6",
-        "joinExpression": "t1.patient_program_id = t6.patient_program_id"
+        "joinExpression": "t1.patient_program_id = t6.patient_program_id and t6.end_date is null"
       },
       {
         "joinType": "INNER JOIN",
@@ -262,13 +286,6 @@
         "tableName": "program_workflow_state",
         "alias": "t7",
         "joinExpression": "t6.state = t7.program_workflow_state_id"
-      },
-      {
-        "joinType": "INNER JOIN",
-        "schema": "amrs",
-        "tableName": "encounter",
-        "alias": "t8",
-        "joinExpression": "t1.patient_id = t8.patient_id"
       },
       {
         "joinType": "INNER JOIN",
@@ -304,6 +321,13 @@
         "tableName": "concept_name",
         "alias": "t13",
         "joinExpression": "t13.concept_id = t7.concept_id"
+      },
+      {
+        "joinType": "INNER JOIN",
+        "schema": "amrs",
+        "tableName": "concept",
+        "alias": "t11",
+        "joinExpression": "t7.concept_id = t11.concept_id"
       }
     ],
     "parameters": [
@@ -370,12 +394,12 @@
         "parameter": "programUuids"
       },
       {
-        "expression": "t7.uuid in ?",
-        "parameter": "stateUuids"
+        "expression": "t11.uuid in ?",
+        "parameter": "providerUuids"
       },
       {
         "expression": "t11.uuid in ?",
-        "parameter": "providerUuids"
+        "parameter": "stateUuids"
       }
     ],
     "groupClause": [

@@ -44,14 +44,14 @@ module.exports = function () {
                 _.each(queryParams.programUuids.split(','), function (program) {
                     programUuids.push(String(program));
                 });
-                queryParams.programUuids = programUuids;
+                queryParams.programUuids = programUuids || ["*"];
             }
             var stateUuids = [];
             if (queryParams.stateUuids) {
                 _.each(queryParams.stateUuids.split(','), function (state) {
                     stateUuids.push(String(state));
                 });
-                queryParams.stateUuids = stateUuids;
+                queryParams.stateUuids = stateUuids || ["*"];
             }
 
             var providerUuids = [];
@@ -60,6 +60,15 @@ module.exports = function () {
                     providerUuids.push(String(provider));
                 });
                 queryParams.providerUuids = providerUuids;
+                
+            }
+            // format conceptUuid
+            var conceptUuids = [];
+            if (queryParams.conceptUuids) {
+                _.each(queryParams.conceptUuids.split(','), function (state) {
+                    conceptUuids.push(String(state));
+                });
+                queryParams.conceptUuids = conceptUuids;
             }
 
             //
@@ -152,7 +161,9 @@ module.exports = function () {
             return concepts[code];
         },
         getARVNames: function getARVNames(str) {
-            if (str === null || str === undefined) return "";
+            if (str === null || str === undefined || str === 'unknown') {
+                return "";
+            }
             var arvs = {
                             625:{mapped_to_ids:"625",name:"STAVUDINE"},
                             628:{mapped_to_ids:"628",name:"LAMIVUDINE"},

@@ -2202,7 +2202,9 @@ module.exports = function () {
                     preRequest.resolveLocationIdsToLocationUuids(request,
                         function () {
                             let requestParams = Object.assign({}, request.query, request.params);
-                            let reportParams = etlHelpers.getReportParams('patient-referral-report', ['startDate', 'endDate', 'locationUuids', 'gender', 'startAge', 'endAge', 'programUuids', 'stateUuids'], requestParams);
+
+                            let reportParams = etlHelpers.getReportParams('patient-referral-report', ['startDate', 'endDate', 'locationUuids',
+                                'gender', 'startAge', 'endAge', 'programUuids', 'stateUuids','conceptUuids'], requestParams);
 
                             let service = new PatientReferralService();
                             service.getAggregateReport(reportParams).then((result) => {
@@ -2240,7 +2242,10 @@ module.exports = function () {
                             .description("The program to filter by"),
                         stateUuids: Joi.string()
                             .optional()
-                            .description("The stateUuids to filter by")
+                            .description("The stateUuids to filter by"),
+                        conceptUuids: Joi.string()
+                            .optional()
+                            .description("The conceptUuids to filter by")
 
                     }
                 }
@@ -2267,6 +2272,7 @@ module.exports = function () {
                     request.query.reportName = 'referral-patient-list';
                     let requestParams = Object.assign({}, request.query, request.params);
                     let reportParams = etlHelpers.getReportParams('referral-patient-list', ['startDate', 'endDate', 'locationUuids','providerUuids',  'gender', 'startAge', 'endAge', 'programUuids', 'stateUuids'], requestParams);
+
 
                    // let requestParams = Object.assign({}, request.query, request.params);
                     let service = new PatientReferralService();
