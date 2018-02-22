@@ -2204,7 +2204,7 @@ module.exports = function () {
                             let requestParams = Object.assign({}, request.query, request.params);
 
                             let reportParams = etlHelpers.getReportParams('patient-referral-report', ['startDate', 'endDate', 'locationUuids',
-                                'gender', 'startAge', 'endAge', 'programUuids', 'stateUuids','conceptUuids'], requestParams);
+                                'gender', 'startAge', 'endAge', 'programUuids', 'stateUuids','conceptUuids','providerUuids'], requestParams);
 
                             let service = new PatientReferralService();
                             service.getAggregateReport(reportParams).then((result) => {
@@ -2245,7 +2245,10 @@ module.exports = function () {
                             .description("The stateUuids to filter by"),
                         conceptUuids: Joi.string()
                             .optional()
-                            .description("The conceptUuids to filter by")
+                            .description("The conceptUuids to filter by"),
+                        providerUuids: Joi.string()
+                            .optional()
+                            .description("A list of comma separated provider uuids")
 
                     }
                 }

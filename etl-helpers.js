@@ -59,7 +59,7 @@ module.exports = function () {
                 _.each(queryParams.providerUuids.split(','), function (provider) {
                     providerUuids.push(String(provider));
                 });
-                queryParams.providerUuids = providerUuids;
+                queryParams.providerUuids = providerUuids || ["*"];
                 
             }
             // format conceptUuid

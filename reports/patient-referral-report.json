@@ -49,7 +49,7 @@
         "alias": "t7",
         "joinExpression": "t4.location_id = t7.location_id"
       },
-
+      
       {
         "joinType": "INNER JOIN",
         "schema": "amrs",
@@ -70,6 +70,13 @@
         "tableName": "person",
         "alias": "t10",
         "joinExpression": "t4.patient_id = t10.person_id"
+      }, 
+      {
+        "joinType": "INNER JOIN",
+        "schema": "amrs",
+        "tableName": "provider",
+        "alias": "t14",
+        "joinExpression": "t14.provider_id = t1.provider_id"
       }
 
 
@@ -79,6 +86,7 @@
       {"name":"endDate", "defaultValue":["defaultValue"]},
       {"name":"locationUuids","defaultValue":[]},
       {"name":"programUuids","defaultValue":[]},
+      {"name":"providerUuids","defaultValue":[]},
       {"name":"stateUuids","defaultValue":[]},
       {"name":"conceptUuids","defaultValue":[]},
       {"name":"startAge", "defaultValue":[]},
@@ -129,6 +137,10 @@
       {
         "expression": "t8.uuid in ?",
         "parameter": "stateUuids"
+      },
+      {
+        "expression": "t14.uuid in ?",
+        "parameter": "providerUuids"
       }
     ],
     "groupClause": [
@@ -290,44 +302,30 @@
       {
         "joinType": "INNER JOIN",
         "schema": "amrs",
+        "tableName": "concept_name",
+        "alias": "t8",
+        "joinExpression": "t8.concept_id = t7.concept_id"
+      },
+      {
+        "joinType": "INNER JOIN",
+        "schema": "amrs",
         "tableName": "location",
         "alias": "t9",
         "joinExpression": "t1.location_id = t9.location_id"
-      },
-      {
-        "joinType": "INNER JOIN",
-        "schema": "amrs",
-        "tableName": "encounter_provider",
-        "alias": "t10",
-        "joinExpression": "t10.encounter_id = t8.encounter_id"
-      },
-      {
-        "joinType": "INNER JOIN",
-        "schema": "amrs",
-        "tableName": "provider",
-        "alias": "t11",
-        "joinExpression": "t11.provider_id = t10.provider_id"
-      },
-       {
-        "joinType": "INNER JOIN",
-        "schema": "amrs",
-        "tableName": "person_name",
-        "alias": "t12",
-        "joinExpression": "t12.person_id = t11.person_id"
-      },
-      {
-        "joinType": "INNER JOIN",
-        "schema": "amrs",
-        "tableName": "concept_name",
-        "alias": "t13",
-        "joinExpression": "t13.concept_id = t7.concept_id"
-      },
+      }, 
       {
         "joinType": "INNER JOIN",
         "schema": "amrs",
         "tableName": "concept",
         "alias": "t11",
-        "joinExpression": "t7.concept_id = t11.concept_id"
+        "joinExpression": "t11.concept_id = t7.concept_id"
+      },  
+      {
+        "joinType": "INNER JOIN",
+        "schema": "amrs",
+        "tableName": "provider",
+        "alias": "t14",
+        "joinExpression": "t14.provider_id = t10.provider_id"
       }
     ],
     "parameters": [
@@ -378,11 +376,11 @@
     ],
     "filters": [
       {
-        "expression":"t8.encounter_datetime >= ?",
+        "expression":"t10.date_created >= ?",
         "parameter":"startDate"
       },
       {
-        "expression":"t8.encounter_datetime <= ?",
+        "expression":"t10.date_created <= ?",
         "parameter":"endDate"
       },
       {
@@ -395,11 +393,11 @@
       },
       {
         "expression": "t11.uuid in ?",
-        "parameter": "providerUuids"
+        "parameter": "stateUuids"
       },
       {
-        "expression": "t11.uuid in ?",
-        "parameter": "stateUuids"
+        "expression": "t14.uuid in ?",
+        "parameter": "providerUuids"
       }
     ],
     "groupClause": [
@@ -462,12 +460,17 @@
       {
         "label": "state_name",
         "type": "single",
-        "sql": "t13.name"
+        "sql": "t8.name"
       },
-       {
-        "label": "provider_name",
+      {
+        "label": "current_state_date",
         "type": "single",
-        "sql": "concat(COALESCE(t12.given_name,''),' ',COALESCE(t12.middle_name,''),' ',COALESCE(t12.family_name,''))"
+        "sql": "t6.date_created"
+      },
+      {
+        "label": "initial_referral_date",
+        "type": "single",
+        "sql":  "t10.date_created"
       }
     ]
   }
