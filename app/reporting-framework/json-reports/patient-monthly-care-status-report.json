@@ -1,0 +1,72 @@
+{
+    "name": "patient_monthly_care_status",
+    "version": "1.0",
+    "tag": "patient_monthly_care_status",
+    "description": "Patient Monthly Care Status",
+    "sources": [
+        {
+            "table": "etl.flat_hiv_summary_v15b",
+            "alias": "t1"
+        },
+        {
+            "table": "etl.dates",
+            "alias": "t2",
+            "join": {
+                "type": "INNER",
+                "joinCondition": "t1.encounter_datetime <= t2.endDate"
+            }
+        }
+    ],
+    "columns": [
+        {
+            "type": "derived_column",
+            "alias": "monthly_patient_care_status",
+            "expressionType": "simple_expression",
+            "expressionOptions": {
+                "expression": "CASE WHEN TIMESTAMPDIFF(DAY, IF(t1.rtc_date, t1.rtc_date, DATE_ADD(t1.encounter_datetime, INTERVAL 30 DAY)), t2.endDate) <= 90 AND t1.transfer_out IS NULL AND COALESCE(t1.death_date, t1.out_of_care) IS NULL THEN 'active' WHEN TIMESTAMPDIFF(DAY, IF(t1.rtc_date, t1.rtc_date, DATE_ADD(t1.encounter_datetime, INTERVAL 30 DAY)), t2.endDate) > 90 AND transfer_out IS  NULL THEN 'ltfu' WHEN t1.transfer_out IS NOT NULL AND COALESCE(t1.death_date) IS NULL THEN 'transfered_out' END"
+            }
+        },
+        {
+            "type": "derived_column",
+            "alias": "month",
+            "expressionType": "simple_expression",
+            "expressionOptions": {
+                "expression": "DATE_FORMAT(t2.endDate,'%M %Y')"
+            }
+        }
+    ],
+    "filters": {
+        "conditionJoinOperator": "and",
+        "conditions": [
+            {
+                "filterType": "tableColumns",
+                "conditionExpression": "t1.uuid = ?",
+                "parameterName": "patient_uuid"
+            },
+            {
+                "filterType": "tableColumns",
+                "conditionExpression": "t2.endDate >=  ?",
+                "parameterName": "startDate"
+            },
+            {
+                "filterType": "tableColumns",
+                "conditionExpression": "t2.endDate <=  ?",
+                "parameterName": "endDate"
+            },
+            {
+                "filterType": "tableColumns",
+                "conditionExpression": "(t1.next_clinical_datetime_hiv IS NULL OR t1.next_clinical_datetime_hiv > t2.endDate)",
+                "parameterName": ""
+            },
+            {
+                "filterType": "tableColumns",
+                "conditionExpression": "next_clinical_datetime_hiv IS NULL",
+                "parameterName": ""
+            }
+        ]
+    },
+    "groupBy":{
+        "columns":["endDate"]
+    }
+
+}
