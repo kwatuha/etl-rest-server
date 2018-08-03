@@ -220,7 +220,7 @@ module.exports = function () {
             columns: request.query.fields || "t1.*, t2.cur_arv_meds",
             table: "etl.flat_labs_and_imaging",
             leftOuterJoins: [
-                ['(select * from etl.flat_hiv_summary where is_clinical_encounter and uuid="' + uuid + '" group by date(encounter_datetime))',
+                ['(select * from etl.flat_hiv_summary_v15b where is_clinical_encounter and uuid="' + uuid + '" group by date(encounter_datetime))',
                     't2', 'date(t1.test_datetime) = date(t2.encounter_datetime)'
                 ]
             ],
@@ -254,7 +254,7 @@ module.exports = function () {
 
         var queryParts = {
             columns: request.query.fields || "*",
-            table: "etl.flat_hiv_summary",
+            table: "etl.flat_hiv_summary_v15b",
             where: ["uuid = ?", uuid],
             order: order || [{
                 column: 'encounter_datetime',
